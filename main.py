@@ -1,11 +1,9 @@
 import pandas as pd
-import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from sklearn.impute import SimpleImputer
-from datetime import datetime
 
 
 print("Loading data. . .")
@@ -63,26 +61,14 @@ model = Pipeline(steps=[('preprocessor', preprocessor),
 print("Training model. . .")
 model.fit(X, y)
 
-# --------------------------
-# Load and Preprocess Test Data
-# --------------------------
 test = pd.read_csv("test.csv")
 test_ids = test['id'].copy()
 
 test = extract_time_features(test)
 test = test.drop(cols_to_drop, axis=1, errors='ignore')
 
-# Ensure same columns exist in test; if not, they'll be handled by the pipeline (missing categories etc.)
-# No need to drop or reselect columns here as ColumnTransformer will handle present and missing columns gracefully.
-
-# --------------------------
-# Predict on Test Data
-# --------------------------
 predictions = model.predict(test)
 
-# --------------------------
-# Create Submission
-# --------------------------
 submission = pd.DataFrame({'id': test_ids, 'is_fraud': predictions})
 submission.to_csv("submission.csv", index=False)
 print("Submission file created: submission.csv")
